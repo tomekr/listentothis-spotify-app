@@ -1,0 +1,16 @@
+{
+	"BundleType": "Application",
+	"BundleIdentifier": "listentothis",
+	"AppIcon": {
+		"18x18": "logo.png"
+	},
+	"AppName": {
+		"en": "/r/listentothis"
+	},
+	"SupportedLanguages": [
+		"en"
+	],
+	"RequiredPermissions": [
+		"http://www.reddit.com"
+	]
+}
