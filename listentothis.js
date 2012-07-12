@@ -35,31 +35,28 @@ function updatePageWithTrackDetails() {
 }
 
 function getFrontPage() {
-
 	var req = new XMLHttpRequest();
-  console.log("about to attempt a get!");
+
 	req.open("GET", "http://www.reddit.com/r/listentothis/top.json?sort=top&t=day", true);
 
 	req.onreadystatechange = function() {
-
 		console.log(req.status);
 
-   		if (req.readyState == 4) {
-    		if (req.status == 200) {
-       			console.log("Fetch complete! Parsing!");
+    if (req.readyState == 4) {
+      if (req.status == 200) {
+          // Parse the JSON response
+          response = JSON.parse(req.responseText);
 
-            // Parse the JSON response
-            response = JSON.parse(req.responseText);
+          // Grab the children which correspond to each post
+          children = response.data.children;
 
-            children = response.data.children;
+          // Map over the array of children grabbing the title of each reddit
+          // post
+          songs = children.map(parseRedditTitle).filter(function(e){return e});
 
-            // Map over the array of children grabbing the title of each reddit
-            // post
-            songs = children.map(parseRedditTitle);
-
-            console.log(songs.filter(function(e){return e}));
-     		}
-   		}
+          listdown(songs);
+      }
+    }
   	};
 
 	req.send();
@@ -70,7 +67,6 @@ function parseRedditTitle(o) {
 
   if (data) {
     title = o.data.title;
-    console.log(title);
 
     // try to grab the title and artist using the default title style shown in
     // the /r/listentothis sidebar
@@ -83,11 +79,8 @@ function parseRedditTitle(o) {
       trackTitle  = match[1];
       trackArtist = match[2];
     } else {
-      return "";
+      return null;
     }
-
-    console.log("title: " + trackTitle);
-    console.log("artist: " + trackArtist);
 
     song = {
       title:  trackTitle,
@@ -96,7 +89,7 @@ function parseRedditTitle(o) {
 
     return song
   } else {
-    return "";
+    return null;
   }
 }
 
@@ -104,4 +97,18 @@ function parseRedditTitle(o) {
 // the right song
 function searchTermify(string) {
 
+}
+
+function listdown(songs) {
+  console.log(songs);
+
+  var startlist = "<ul>";
+  var endlist = "<ul>";
+
+  var lis = songs.map( function(song) {
+    return "<li>" + song.title + " - " + song.artist + "</li>";
+  }).join('');
+
+  var list = document.getElementById("list");
+  document.getElementById("list").innerHTML = startlist + lis + endlist;
 }
