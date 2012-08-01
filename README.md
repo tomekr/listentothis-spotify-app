@@ -4,6 +4,8 @@ https://developer.spotify.com/technologies/apps/tutorial/
 
 At the moment the app just greps the top /r/listentothis page and displays them in the application.
 
+Main logic can be found in listentothis.js
+
 TODO: 
 - Allow ability to queue list
 - Allow ability to view results for hot, new, controversial, top, saved
