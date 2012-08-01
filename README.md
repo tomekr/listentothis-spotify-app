@@ -8,4 +8,5 @@ TODO:
 - Allow ability to queue list
 - Allow ability to view results for hot, new, controversial, top, saved
 - Allow ability to select number of songs to view
+- Allow ability to send /r/listentothis tracks to a playlist
 - Make the app look good with some nice CSS
