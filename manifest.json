@@ -2,7 +2,7 @@
 	"BundleType": "Application",
 	"BundleIdentifier": "listentothis",
 	"AppIcon": {
-		"18x18": "logo.png"
+		"18x18": "img/logo.png"
 	},
 	"AppName": {
 		"en": "/r/listentothis"

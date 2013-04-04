@@ -1,0 +1,18 @@
+h1 {
+	text-align: center;
+	font-size: 24px;
+	padding: 20px;
+}
+
+div.track {
+  padding-left: 22px;
+  height: 22px;
+  vertical-align: bottom;
+  cursor: pointer;
+}
+div.track:hover {
+  color: #aaa;
+}
+div.track.playing {
+  color: #fff;
+}

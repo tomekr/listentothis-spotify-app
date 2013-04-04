@@ -4,10 +4,11 @@
 	<meta charset="utf-8">
 	<title>Reddit /r/listentothis</title>
 	<link rel="stylesheet" href="sp://import/css/adam.css">
-	<link rel="stylesheet" href="tutorial.css">
+	<link rel="stylesheet" href="css/listentothis.css">
 </head>
-<body onload="sp = getSpotifyApi(1); listentothis = sp.require('listentothis'); listentothis.init();">
-  <h1 id="header">Top Tracks for Today</h1>
+<body onload="sp = getSpotifyApi(1); listentothis = sp.require('js/listentothis'); listentothis.init();">
+  <h1 id="header">Top Tracks of the <span id="timespan">Week</span></h1>
   <div id="list"></div>
+  <div id="spotify"></div>
 </body>
 </html>
