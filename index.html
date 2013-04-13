@@ -9,12 +9,11 @@
   <link rel="stylesheet" type="text/css" href="sp://import/css/list.css">
 
   <link rel="stylesheet" href="sp://listentothis/css/listentothis.css">
-	<link rel="stylesheet" href="sp://listentothis/css/table.css">
 </head>
 <body onload="sp = getSpotifyApi(1); listentothis = sp.require('js/listentothis'); listentothis.init();">
-  <h1 id="header">Top Tracks of the <input id="timespan" value="Week"/> from r/<input id="subreddit" value="listentothis"/><br/></h1>
+  <h1 id="header">Top Tracks of the <input id="timespan" value="day"/> from r/<input id="subreddit" value="listentothis"/><br/></h1>
   <div id="config">
-    <p><span>Regex: <input id="regex" value="^(.*?)\s*-\s*(.+?)\s+.*$" /></span><button id="regex-reset" class="sp-button">reset</button></p>
+    <p><span>Regex: <input id="regex" value="^(.+?)\s*-+\s*(.+?)\s+[\[\(].*$" /></span><button id="regex-reset" class="sp-button">reset</button></p>
     <p><button class="sp-button sp-primary">Reload</button></p>
   </div>
   <div id="grid"></div>

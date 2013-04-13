@@ -3,7 +3,6 @@ sp.require("sp://listentothis/js/jquery-1.9.1.min");
 var models = sp.require('sp://import/scripts/api/models');
 var views = sp.require('sp://import/scripts/api/views');
 var ui = sp.require('sp://import/scripts/ui');
-var table = sp.require('sp://listentothis/js/table');
 var player = models.player;
 
 exports.init = init;
@@ -56,8 +55,6 @@ function getFrontPage() {
             for (var i = 0; i < songs.length; i++) {
               s = songs[i]
               if(s != null) {
-                console.log("searching for..");
-                console.log(s);
                 findAndDisplay(makeID(s));
               }
             }
@@ -79,7 +76,7 @@ function getFrontPage() {
 }
 
 function makeID(song) {
-  return escape(song.artist + " " + song.title);
+  return escape("artist:\"" + song.artist + "\" title:\"" + song.title + "\"");
 }
 
 function searchTermify(search_term, revert) {
@@ -134,7 +131,7 @@ function findAndDisplay(search_term) {
     }
     if(result) {
       console.log("..found for " + unescape(search_term) + ":");
-      console.log(result);
+      console.log(result.data.artists[0].name + " - " + result.data.name);
       tempPlaylist.add(result);
     }
   });
