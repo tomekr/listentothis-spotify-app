@@ -2,26 +2,43 @@ var sp = getSpotifyApi(1);
 sp.require("sp://listentothis/js/jquery-1.9.1.min");
 var models = sp.require('sp://import/scripts/api/models');
 var views = sp.require('sp://import/scripts/api/views');
+var ui = sp.require('sp://import/scripts/ui');
+var table = sp.require('sp://listentothis/js/table');
 var player = models.player;
 
 exports.init = init;
 
 var songs = [];
+var tempPlaylist = new models.Playlist();
+var orig_regex;
 
 function init() {
   $(document).ready(function() {
-    getFrontPage("week");
+    orig_regex = $("#regex").val();
+    getFrontPage();
+    $("#timespan").change(function() {getFrontPage();});
+    $("#subreddit").change(function() {getFrontPage();});
+    $("#regex").change(function() {getFrontPage();});
+    $("#regex-reset").click(function() {$("#regex").val(orig_regex);});
   });
 }
 
-function getFrontPage(timespan) {
+function clearPlaylist(playlist) {
+  while(playlist.data.length > 0) {
+    playlist.data.remove(0);
+  }
+}
+
+function getFrontPage() {
+  clearPlaylist(tempPlaylist);
 	var req = new XMLHttpRequest();
 
-  $("#timespan").text = timespan;
-	req.open("GET", "http://www.reddit.com/r/listentothis/top.json?sort=top&t="+timespan, true);
+  timespan = $("#timespan").val();
+  subreddit = $("#subreddit").val();
+  uri = "http://www.reddit.com/r/"+subreddit+"/top.json?sort=top&t="+timespan
+	req.open("GET", uri, true);
 
 	req.onreadystatechange = function() {
-		console.log(req.status);
 
     if (req.readyState == 4) {
       if (req.status == 200) {
@@ -35,14 +52,25 @@ function getFrontPage(timespan) {
           // post
           songs = children.map(parseRedditTitle);
 
-          for (var i = 0; i < songs.length; i++) {
-            s = songs[i]
-            if(s != null) {
-              console.log(s);
-              $("#list").append("<div class=\"track\" id=\"" + s.artist + " " + s.title + "\">" + s.artist + " - " + s.title + "</div>");
+          if(songs.length > 0) {
+            for (var i = 0; i < songs.length; i++) {
+              s = songs[i]
+              if(s != null) {
+                console.log("searching for..");
+                console.log(s);
+                findAndDisplay(makeID(s));
+              }
             }
+            var plr = new views.Player();
+            plr.node.style.width = "128px";
+            plr.node.style.height = "128px";
+            plr.context = tempPlaylist;
+            var list = new views.List(tempPlaylist);
+            list.node.classList.add("sp-light");
+            $("#grid").empty().append(plr.node).append(list.node);
+          } else {
+            console.log("..found nothing.");
           }
-          $("#list .track").click(function () {findAndPlay($(this).attr("id"))});
       }
     }
   	};
@@ -50,60 +78,65 @@ function getFrontPage(timespan) {
 	req.send();
 }
 
+function makeID(song) {
+  return escape(song.artist + " " + song.title);
+}
+
 function searchTermify(search_term, revert) {
-  return search_term.replace("Remix","").replace("Mix", "");
+  search_term = unescape(search_term).replace("Remix","").replace("Mix", "");
+  return search_term;
 }
 
 function distance(s, t) {
-  return Math.abs(s.length - t.length);
+  // levenshtein distance from wikipedia
+  if (!s.length) return t.length;
+  if (!t.length) return s.length;
 
-  // TODO make levenshtein work
-  var cost = 0;
-  var len_s = s.length;
-  var len_t = t.length;
-
-  if(len_s == 0) return len_t;
-  if(len_t == 0) return len_s;
-  if(s[len_s - 1] == t[len_t - 1])
-    cost = 0;
-  else
-    cost = 1;
-  return Math.min(distance(s.slice(0, len_s - 2), t) + 1,
-                  Math.min(distance(s, t.slice(0, len_t - 2)) + 1,
-                           distance(s.slice(0, len_s - 2), t.slice(0, len_t - 2)) + cost));
+  return Math.min(
+    distance(s.substr(1), t) + 1,
+    distance(t.substr(1), s) + 1,
+    distance(s.substr(1), t.substr(1)) + (s[0] !== t[0] ? 1 : 0)
+  );
 }
 
-function findAndPlay(search_term) {
-  console.log(search_term);
-  console.log(searchTermify(search_term, false));
+function findAndDisplay(search_term) {
   var search = new models.Search(searchTermify(search_term, false));
   search.localResults = models.LOCALSEARCHRESULTS.APPEND;
 
+  var test = null;
   search.observe(models.EVENT.CHANGE, function() {
-    
     var result = null;
     var lv = null;
     for(var i=0; i < search.tracks.length && lv != 0; i++) {
       s = search.tracks[i];
-      console.log(s);
       if(lv == null) {
-        lv = Math.max(search_term.length, (searchTermify(s.artist + " " + s.title, false)).length);
+        lv = search_term.length;
       }
       if(result == null) {
-        result = search.tracks[0].data.uri;
-      } else if(distance(search_term, searchTermify(s.artist + " " + s.title, false)) < lv) {
-        result = search.tracks[0].data.uri;
-        lv = distance(search_term, searchTermify(s.artist + " " + s.title, false));
-      } else if(distance(search_term, searchTermify(s.title + " " + s.artist, true)) < lv) {
-        result = search.tracks[0].data.uri;
-        lv = distance(search_term, searchTermify(s.title + " " + s.artist, true));
+        result = s;
+        continue;
       }
-      console.log(result + " " + lv);
+      /*
+      var lv_artist_title = distance(search_term, s.data.artist + " " + s.data.title);
+      console.log("lv_artist_title = " + lv_artist_title);
+      var lv_title_artist = distance(search_term, s.data.title + " " + s.data.artist);
+      console.log("lv_artist_title = " + lv_title_artist);
+      if(tmp < lv) {
+        result = s;
+        lv = distance(search_term, s.artist + " " + s.title);
+        continue;
+      }
+      if(tmp < lv) {
+        result = s;
+        lv = tmp;
+      }
+      */
     }
-    $("div.playing").removeClass("playing");
-    (new views.Player()).play(result);
-    $("div[id=\""+search_term+"\"]").addClass("playing");
-    
+    if(result) {
+      console.log("..found for " + unescape(search_term) + ":");
+      console.log(result);
+      tempPlaylist.add(result);
+    }
   });
   search.appendNext();
 }
@@ -119,7 +152,8 @@ function parseRedditTitle(o) {
     //
     // Artist - Title [genre] description
 
-    var match = title.match(/^(.*?)\s*-+\s*(.+?)\s*\[+.*$/i);
+    console.log($("#regex").val());
+    var match = title.match(eval("/" + $("#regex").val() + "/i"));
 
     if (match) {
       trackTitle  = match[2];

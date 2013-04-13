@@ -3,12 +3,21 @@
 <head>
 	<meta charset="utf-8">
 	<title>Reddit /r/listentothis</title>
-	<link rel="stylesheet" href="sp://import/css/adam.css">
-	<link rel="stylesheet" href="css/listentothis.css">
+  <link rel="stylesheet" type="text/css" href="sp://import/css/eve.css">
+  <link rel="stylesheet" type="text/css" href="sp://import/css/api.css">
+  <link rel="stylesheet" type="text/css" href="sp://import/css/player.css">
+  <link rel="stylesheet" type="text/css" href="sp://import/css/list.css">
+
+  <link rel="stylesheet" href="sp://listentothis/css/listentothis.css">
+	<link rel="stylesheet" href="sp://listentothis/css/table.css">
 </head>
 <body onload="sp = getSpotifyApi(1); listentothis = sp.require('js/listentothis'); listentothis.init();">
-  <h1 id="header">Top Tracks of the <span id="timespan">Week</span></h1>
-  <div id="list"></div>
+  <h1 id="header">Top Tracks of the <input id="timespan" value="Week"/> from r/<input id="subreddit" value="listentothis"/><br/></h1>
+  <div id="config">
+    <p><span>Regex: <input id="regex" value="^(.*?)\s*-\s*(.+?)\s+.*$" /></span><button id="regex-reset" class="sp-button">reset</button></p>
+    <p><button class="sp-button sp-primary">Reload</button></p>
+  </div>
+  <div id="grid"></div>
   <div id="spotify"></div>
 </body>
 </html>
