@@ -4,15 +4,27 @@ h1 {
 	padding: 20px;
 }
 
-div.track {
-  padding-left: 22px;
-  height: 22px;
-  vertical-align: bottom;
-  cursor: pointer;
+#timespan {
+  width: 4em;
 }
-div.track:hover {
-  color: #aaa;
+
+#subreddit {
+  width: 8em;
 }
-div.track.playing {
-  color: #fff;
+
+#config {
+  text-align: center;
+}
+
+#grid {
+  margin: 0 auto;
+  text-align: center;
+}
+
+#grid .sp-player {
+  margin: 10px auto;
+}
+
+#grid .sp-list {
+  text-align: left;
 }
