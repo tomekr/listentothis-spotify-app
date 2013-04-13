@@ -1,4 +1,4 @@
-# r/Listentothis
+# /r/listentothis
 
 ![Screenshot](img/screenshot.png)
 
@@ -9,8 +9,9 @@ At the moment the app just greps the top of any /r/ page and displays them in a 
 Main logic can be found in listentothis.js
 
 # TODO
-[x] Allow to queue list
-[ ] Allow ability to view results for hot, new, controversial, top, saved
-[ ] Allow ability to select number of songs to view
-[ ] Allow ability to send tracks to a playlist
-[x] Make the app look better with some nice CSS
+
+* Allow to queue list
+* Allow ability to view results for hot, new, controversial, top, saved
+* Allow ability to select number of songs to view
+* Allow ability to send tracks to a playlist
+* Make the app look better with some nice CSS
