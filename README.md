@@ -15,3 +15,5 @@ Main logic can be found in listentothis.js
 * Allow ability to select number of songs to view
 * Allow ability to send tracks to a playlist
 * Make the app look better with some nice CSS
+
+![:D](img/logo.png)
