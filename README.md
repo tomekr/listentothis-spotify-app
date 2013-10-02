@@ -2,7 +2,13 @@
 
 ![Screenshot](img/screenshot.png)
 
-Please follow the [Spotify App Developer Tutorial](https://developer.spotify.com/technologies/apps/tutorial/) on getting the app loaded into your Spotify client.
+# Install
+
+* `mkdir ~/Spotify; cd ~/Spotify; git clone https://github.com/spazzpp2/listentothis-spotify-app.git listentothis`
+* Start (restart) Spotify
+* Enter `spotify:app:listentothis` in Spotify's searchbar
+
+# Features
 
 At the moment the app just greps the top of any /r/ page and displays them in a playlist.
 
