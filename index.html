@@ -11,12 +11,32 @@
   <link rel="stylesheet" href="sp://listentothis/css/listentothis.css">
 </head>
 <body onload="sp = getSpotifyApi(1); listentothis = sp.require('js/listentothis'); listentothis.init();">
-  <h1 id="header">Top Tracks of the <input id="timespan" value="day"/> from r/<input id="subreddit" value="listentothis"/><br/></h1>
-  <div id="config">
-    <p><span>Regex: <input id="regex" value="^(.+?)\s*-+\s*(.+?)\s+[\[\(].*$" /></span><button id="regex-reset" class="sp-button">reset</button></p>
-    <p><button class="sp-button sp-primary">Reload</button></p>
-  </div>
-  <div id="grid"></div>
-  <div id="spotify"></div>
+  <header>
+    <div id="grid"></div>
+    <div>
+      <div id="control">
+        <h1>
+          <img src="img/logo.png" alt="Reddit:"/>
+          <span id="s_sort">top</span>
+          <span> </span>
+          <span> tracks of the </span>
+          <span id="s_timespan">month</span>
+          <span> from </span>
+          <input id="subreddit" value="/r/listentothis"/>
+          <button id="b_reload" class="sp-button sp-primary">Reload</button>
+          <button id="b_config" class="sp-button">&#9881;</button>
+        </h1>
+        <div id="config">
+          <h1><span id="s_ratio"> ... </span></h1>
+          <p>Sort: <input id="sort" value="top" />
+          Time: <input id="timespan" value="month" /></p>
+          <p>Regex: <input id="regex" value="" /></p>
+          <p>
+            <button id="b_reset" class="sp-button">Reset</button>
+          </p>
+        </div>
+      </div>
+  </header>
+  <article id="spotify"></article>
 </body>
 </html>
