@@ -10,18 +10,18 @@ exports.init = init;
 const LIMIT = 100;
 
 var songs = new Array(LIMIT);
+var num_songs = 0;
 var last_song = 0;
 var results = new Array(LIMIT);
 var reddit = new Array(LIMIT);
 var title_to_index = {};
 var tempPlaylist = new models.Playlist();
-
+var quality = [0, 0, 0];
 var defaults = {
   "regex": "^(\\[.+\\][-\\s]+)*(.+?)\\s+(-{1,2}|by)\\s+(\\\".+?\\\"|.+?)\\s*(\\..*|from.+|[\\[\\(].+)*$",
   "sort": "hot",
   "timespan": "day",
 }
-var quality = [0, 0];
 
 function init() {
   $(document).ready(function() {
@@ -48,6 +48,8 @@ function init() {
     });
     $("#b_reset").click(function() {
       $("#regex").val(defaults["regex"]);
+      $("#sort").val(defaults["sort"]);
+      $("#timespan").val(defaults["timespan"]);
     });
     $("#b_reload").click(resetClicked);
   });
@@ -65,23 +67,32 @@ function clearPlaylist(playlist) {
   }
 }
 
-function getFrontPage() {
-  clearPlaylist(tempPlaylist);
-	var req = new XMLHttpRequest();
-
+function resetAll(playlist) {
+  quality = [0, 0, 0];
   songs = new Array(LIMIT);
   last_song = 0;
+  num_songs = 0;
   reddit = new Array(LIMIT);
   results = new Array(LIMIT);
+
+  clearPlaylist(playlist);
+}
+
+function getFrontPage() {
+  resetAll(tempPlaylist);
+	var req = new XMLHttpRequest();
 
   sort = $("#sort").val();
   timespan = $("#timespan").val();
   subreddit = $("#subreddit").val().replace("http://www.reddit.com", "");
   $("#subreddit").val(subreddit);
-  var uri = "http://www.reddit.com"+subreddit+"/"+sort+".json?limit="+LIMIT;
-  if(sort == "top" || sort == "controversial") {
+  var uri = "http://www.reddit.com"+subreddit+"/"+sort+".json";
+  if(sort == "hot") {
+    uri = "http://www.reddit.com"+subreddit+"/"+sort+".json?limit="+LIMIT+"&t="+timespan;
+  } else if(sort == "top" || sort == "controversial") {
     uri = "http://www.reddit.com"+subreddit+"/"+sort+".json?limit="+LIMIT+"&t="+timespan;
   }
+  $("#reddit").html('Link: <a href="http://www.reddit.com' + subreddit + '" target="_blank">' + subreddit + '</a>');
   console.log(uri);
 	req.open("GET", uri, true);
 
@@ -94,8 +105,6 @@ function getFrontPage() {
           // Grab the children which correspond to each post
           children = response.data.children;
 
-          quality = [0, 0];
-          updateRatio(quality);
 
           // Map over the array of children grabbing the title of each reddit
           // post
@@ -109,17 +118,18 @@ function getFrontPage() {
           for (var i = 0; i < children.length; i++) {
             s = songs[i];
             if(s != null) {
-              findAndDisplay(i, makeID(s), i == last_song);
+              findAndDisplay(i, makeID(s), function() {
+                updatePlaylist(tempPlaylist, results);
+              });
             }
           }
 
           var plr = new views.Player();
-          /*plr.node.style.width = "100pt";
-          plr.node.style.height = "100pt";*/
           plr.context = tempPlaylist;
+          $("#grid").empty().append(plr.node);
+
           var list = new views.List(tempPlaylist);
           list.node.classList.add("sp-light");
-          $("#grid").empty().append(plr.node);
           $("#spotify").empty().append(list.node);
       }
     }
@@ -189,13 +199,11 @@ function distance(s, t)
 }
 
 function updateRatio(q) {
-  q = parseInt(q);
-  quality = [quality[0] + q, Math.max(quality[1], q)];
-  console.log(quality);
-  $("#s_ratio").text(tempPlaylist.length+"/"+songs.length + " found, dist.avg: " + quality[0]/tempPlaylist.length + ", dist.max: " + quality[1]);
+  q = parseFloat(q);
+  quality = [quality[0] + q, Math.min(quality[1], q), Math.max(quality[2], q)];
 }
 
-function findAndDisplay(index, search_term, update_list) {
+function findAndDisplay(index, search_term, callback) {
   var search = new models.Search(searchTermify(search_term, false));
   search.localResults = models.LOCALSEARCHRESULTS.APPEND;
 
@@ -205,6 +213,7 @@ function findAndDisplay(index, search_term, update_list) {
     var tmp = null;
     var i = 0;
     var j = 0;
+    var before = null;
     for(i=0; i < Math.min(2, search.tracks.length) && lv != 0; i++) {
       s = search.tracks[i];
       tmp = distance(search_term, makeID2(s.data.artists[0].name, s.data.name));
@@ -224,20 +233,23 @@ function findAndDisplay(index, search_term, update_list) {
       results[index] = result;
       title_to_index[id2] = index;
       if(lv) {
-        updateRatio(1.0 * lv / search_term.length);
+        updateRatio(1.0 * id2.length / lv);
       }
     } else {
       console.log(unescape(search_term) + " <"+lv+"> nothing");
     }
-    if(update_list) {
-      updatePlaylist(tempPlaylist, results);
-    }
+    console.log(before);
+    console.log(result);
+    if(before != result)
+      callback();
+    before = result
   });
   search.appendNext();
 }
 
 function updatePlaylist(playlist, items) {
   var item = null;
+
   clearPlaylist(playlist);
   for(var i=0; i < items.length; i++) {
     item = items[i];
@@ -245,6 +257,12 @@ function updatePlaylist(playlist, items) {
       playlist.add(item);
     }
   }
+
+  ratio_text = "" + playlist.length + '/' + num_songs + ' found, ';
+  ratio_text += "tolerance: " + (quality[0] / playlist.length).toFixed(2) + ' ';
+  ratio_text += "[" + quality[1].toFixed(2) + ', ';
+  ratio_text += "" + quality[2].toFixed(2) + ']';
+  $("#s_ratio").text(ratio_text);
 }
 
 function parseRedditTitle(i, o) {
@@ -267,6 +285,7 @@ function parseRedditTitle(i, o) {
       match.title = title;
       trackArtist = match[2];
       trackTitle  = match[4];
+      num_songs++;
     } else {
       console.log("No match: " + title);
       return null;
