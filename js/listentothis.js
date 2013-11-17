@@ -18,7 +18,7 @@ var title_to_index = {};
 var tempPlaylist = new models.Playlist();
 var quality = [0, 0, 0];
 var defaults = {
-  "regex": "^(\\[.+\\][-\\s]+)*(.+?)\\s+(-{1,2}|by)\\s+(\\\".+?\\\"|.+?)\\s*(\\..*|from.+|[\\[\\(].+)*$",
+  "regex": "^(\\[.+\\][-\\s]+)*(.+?)\\s*(-{1,2}|by)\\s*(\\\".+?\\\"|.+?)\\s*(\\..*|from.+|[\\[\\(].+)*$",
   "sort": "hot",
   "timespan": "day",
 }
