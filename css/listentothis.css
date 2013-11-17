@@ -1,0 +1,37 @@
+header {
+  width: 100%;
+}
+header h1 {
+  margin-bottom: 0;
+}
+header img {
+  vertical-align: middle;
+  box-shadow: 1pt 1pt 2pt rgba(0,0,0,0.5);
+  margin: 2pt;
+}
+header button {
+  margin: 10pt;
+}
+
+#control, #grid, #toggle_config, #config {
+  height: 100pt;
+  float: left;
+  margin: 10px;
+  display: inline;
+}
+
+#control #subreddit {
+  width: 8em;
+}
+
+#grid {
+  width: 100pt;
+  height: 100pt;
+}
+
+#config {
+  display: hidden;
+  text-align: left;
+}
+#config #regex { width: 14em; }
+#config #sort, #config #timespan { width: 5em; }
